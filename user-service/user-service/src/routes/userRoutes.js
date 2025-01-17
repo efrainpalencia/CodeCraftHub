@@ -1,5 +1,5 @@
 const express = require("express");
-const { register, login, getUserProfile } = require("../controllers/userController");
+const { register, login, getUserProfile, updateUserProfile } = require("../controllers/userController");
 const protect = require("../middleware/auth"); // Import authentication middleware
 
 const router = express.Router();
@@ -24,5 +24,12 @@ router.post("/login", login);
  * @access  Private (Requires JWT Token)
  */
 router.get("/profile", protect, getUserProfile); // Protected route, requires authentication
+
+/**
+ * @route   PUT /api/users/profile
+ * @desc    Update user profile
+ * @access  Private (Requires JWT Token)
+ */
+router.put("/profile", protect, updateUserProfile);
 
 module.exports = router;

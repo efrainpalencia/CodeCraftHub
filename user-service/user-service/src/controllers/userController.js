@@ -56,5 +56,46 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Update the authenticated user's profile
+ * @route   PUT /api/users/profile
+ * @access  Private (Requires JWT Token)
+ */
+const updateUserProfile = async (req, res) => {
+  try {
+    // Get the logged-in user's ID from the token (req.user.userId is set in auth middleware)
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update only provided fields
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+
+    // If user wants to update password, hash the new password
+    if (req.body.password) {
+      const bcrypt = require("bcryptjs");
+      user.password = await bcrypt.hash(req.body.password, 10);
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        createdAt: updatedUser.createdAt,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // Export the controller functions
-module.exports = { register, login, getUserProfile };
+module.exports = { register, login, getUserProfile, updateUserProfile };
