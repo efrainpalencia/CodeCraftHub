@@ -1,6 +1,13 @@
+require("dotenv").config();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+// Securely retrieve JWT secret
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error("Missing JWT_SECRET in environment variables");
+}
 
 /**
  * Registers a new user
@@ -53,7 +60,7 @@ const loginUser = async (email, password) => {
  * @returns {string} JWT token
  */
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ userId }, jwtSecret, { expiresIn: "7d" });
 };
 
 module.exports = { registerUser, loginUser };
